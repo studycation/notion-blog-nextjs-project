@@ -21,6 +21,7 @@ const socialLinks = [
     href: 'https://www.instagram.com/gymcoding',
   },
 ];
+
 export default function ProfileSection() {
   return (
     <Card>
