@@ -66,7 +66,7 @@ export const getPostBySlug = async (slug : string) : Promise<{markdown:string; p
     filter: {
       and: [
         {
-          property: 'Slug',
+          property: 'slug',
           rich_text: {
             equals: slug,
           },
