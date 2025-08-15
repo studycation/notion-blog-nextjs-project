@@ -4,16 +4,19 @@ import type {
   PageObjectResponse,
   UserObjectResponse,
 } from '@notionhq/client/build/src/api-endpoints';
+import { NotionToMarkdown } from 'notion-to-md';
 
 export const notion = new Client({
   auth: process.env.NOTION_TOKEN,
 });
 
+const n2m = new NotionToMarkdown({ notionClient: notion });
+
 /**
  * 특정 포스트 정보에서 메타데이터만 추출하는 함수
  * @param page
  */
-function getPostMetadata(page : PageObjectResponse):Post {
+function getPostMetadata(page: PageObjectResponse): Post {
   const { properties } = page;
 
   // 커버 이미지
@@ -60,7 +63,7 @@ function getPostMetadata(page : PageObjectResponse):Post {
  * - markdown과 post 정보 리턴
  * @param slug
  */
-export const getPostBySlug = async (slug : string) : Promise<{markdown:string; post:Post}> => {
+export const getPostBySlug = async (slug: string): Promise<{ markdown: string; post: Post }> => {
   const response = await notion.databases.query({
     database_id: process.env.NOTION_DATABASE_ID!,
     filter: {
@@ -81,11 +84,14 @@ export const getPostBySlug = async (slug : string) : Promise<{markdown:string; p
     },
   });
 
+  const mdBlocks = await n2m.pageToMarkdown(response.results[0].id);
+  const { parent } = n2m.toMarkdownString(mdBlocks);
+
   return {
-    markdown: '',
+    markdown: parent,
     post: getPostMetadata(response.results[0] as PageObjectResponse),
   };
-}
+};
 
 /**
  * Published 포스트들의 메타데이터만 가져오는 API (tag 조건 추가 가능)
