@@ -6,6 +6,8 @@ import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/ca
 import { getPostBySlug } from '@/lib/notion';
 import { formatDate } from '@/lib/date';
 import { MDXRemote } from 'next-mdx-remote-client/rsc';
+import type { MDXRemoteOptions } from 'next-mdx-remote-client/rsc';
+import remarkGfm from 'remark-gfm';
 
 interface TableOfContentsItem {
   id: string;
@@ -117,6 +119,9 @@ interface BlogPostProps {
 export default async function BlogPost({ params }: BlogPostProps) {
   const { slug } = await params;
   const { markdown, post } = await getPostBySlug(slug);
+  const options: MDXRemoteOptions = {
+    mdxOptions: { remarkPlugins: [remarkGfm] },
+  };
 
   return (
     <div className="container py-12">
@@ -152,7 +157,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
           {/* 블로그 본문 */}
           <div className="prose prose-neutral prose-sm dark:prose-invert max-w-none">
-            <MDXRemote source={markdown} />
+            <MDXRemote source={markdown} options={options} />
           </div>
 
           <Separator className="my-16" />
